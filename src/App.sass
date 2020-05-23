@@ -1,0 +1,41 @@
+body
+    margin: 0
+    font-family: sans-serif
+
+.container
+    display: flex
+    justify-content: center
+    align-items: flex-start
+    width: 100%
+
+    > div
+        width: 100%
+        max-width: 1200px
+        margin: 0px 5%
+
+.npcs
+    margin-bottom: 16px
+    height: 68px
+    display: flex
+    align-items: flex-end
+
+.npc
+    padding: 4px
+
+.biomes
+    width: 100%
+    display: flex
+    flex-flow: row wrap
+    align-items: flex-start
+
+    > div
+        width: 50%
+        position: relative
+
+        img.biome
+            width: 100%
+
+        .npc-holder
+            position: absolute
+            left: 32px
+            top: 12px
