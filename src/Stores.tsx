@@ -72,10 +72,10 @@ export const Biomes = [
 
 export type BiomeType = typeof Biomes[number]['name'];
 
-export type NPC = 'Angler' | 'Arms Dealer' | 'Clothier' | 'Cyborg' | 'Demolitionist' | 'Dryad' | 'Dye Trader' | 'Goblin Tinkerer' | 'Golfer' | 'Guide' | 'Mechanic' | 'Merchant' | 'Nurse' | 'Painter' | 'Party Girl' | 'Pirate' | 'Santa Claus' | 'Steampunker' | 'Stylist' | 'Tavernkeep' | 'Tax Collector' | 'Truffle' | 'Witch Doctor' | 'Wizard' | 'Zoologist';
+export type NPCName = 'Angler' | 'Arms Dealer' | 'Clothier' | 'Cyborg' | 'Demolitionist' | 'Dryad' | 'Dye Trader' | 'Goblin Tinkerer' | 'Golfer' | 'Guide' | 'Mechanic' | 'Merchant' | 'Nurse' | 'Painter' | 'Party Girl' | 'Pirate' | 'Santa Claus' | 'Steampunker' | 'Stylist' | 'Tavernkeep' | 'Tax Collector' | 'Truffle' | 'Witch Doctor' | 'Wizard' | 'Zoologist';
 
 export interface INPC {
-    name: NPC;
+    name: NPCName;
     sprite: string;
     
     biomeLove?: BiomeType;
@@ -83,10 +83,10 @@ export interface INPC {
     biomeDislike?: BiomeType;
     biomeHate?: BiomeType;
 
-    npcLove: NPC[];
-    npcLike: NPC[];
-    npcDislike: NPC[];
-    npcHate: NPC[];
+    npcLove: NPCName[];
+    npcLike: NPCName[];
+    npcDislike: NPCName[];
+    npcHate: NPCName[];
 }
 
 export const NPCs: INPC[] = [

@@ -21,6 +21,7 @@ body
 
 .npc
     padding: 4px
+    pointer-events: auto
 
 .biomes
     width: 100%
@@ -38,4 +39,20 @@ body
         .npc-holder
             position: absolute
             left: 32px
+            right: 32px
             top: 12px
+            height: 68px
+            display: flex
+            flex-flow: row wrap
+            align-items: flex-end
+            pointer-events: none
+
+            > div
+                margin-right: 4px
+
+        p
+            color: white
+            margin: 0
+            text-align: center
+            font-weight: bold
+            text-shadow: black 1px 1px 2px

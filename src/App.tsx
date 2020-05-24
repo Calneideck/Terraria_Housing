@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, CSSProperties, useReducer } from 'react';
 import './App.sass';
 
-import { NPC, NPCs, BiomeType, Biomes } from './Stores';
+import { NPCName, NPCs, BiomeType, Biomes } from './Stores';
 
 interface MousePos {
   x: number;
   y: number;
 }
 
-const InitialBiomeState: { [key in BiomeType]: NPC[] } = {
+type BiomeState = { [key in BiomeType]: NPCName[] };
+
+const InitialBiomeState: BiomeState = {
   Forest: [],
   Cavern: [],
   GlowingMushroom: [],
@@ -19,10 +21,109 @@ const InitialBiomeState: { [key in BiomeType]: NPC[] } = {
   Snow: []
 };
 
+const findNPCInBiome = (npc: NPCName, state: BiomeState) => {
+  for (let [key, value] of Object.entries(state))
+    if (value.find(name => name === npc))
+      return key as BiomeType;
+
+  return null;
+}
+
+const activeNPCStyle: CSSProperties = {
+  position: 'fixed',
+  zIndex: 1,
+  transform: 'translate(-50%, -50%)',
+  pointerEvents: 'none'
+};
+
+const biomeReducer = (state: BiomeState, action: { biome: BiomeType, npcs: NPCName[] }) => {
+  switch (action.biome) {
+    case 'Forest':
+      return { ...state, Forest: action.npcs }
+
+    case 'Cavern':
+      return { ...state, Cavern: action.npcs }
+
+    case 'Snow':
+      return { ...state, Snow: action.npcs }
+
+    case 'Desert':
+      return { ...state, Desert: action.npcs }
+
+    case 'Jungle':
+      return { ...state, Jungle: action.npcs }
+
+    case 'Hallow':
+      return { ...state, Hallow: action.npcs }
+
+    case 'Ocean':
+      return { ...state, Ocean: action.npcs }
+
+    case 'GlowingMushroom':
+      return { ...state, GlowingMushroom: action.npcs }
+
+    default:
+      return state;
+  }
+}
+
+const clamp = (val: number, min: number, max: number) => {
+  return Math.min(max, Math.max(val, min));
+}
+
+const calcHappiness = (npc: NPCName, biomeState: BiomeState) => {
+  const biome = findNPCInBiome(npc, biomeState);
+  if (!biome)
+    return null;
+
+  const NPCData = NPCs.find(n => n.name === npc);
+  if (!NPCData)
+    return null;
+
+  let biomeMult = 1.0;
+  switch (biome) {
+    case NPCData.biomeLove:
+      biomeMult = 0.9;
+      break;
+
+    case NPCData.biomeLike:
+      biomeMult = 0.95;
+      break;
+
+    case NPCData.biomeDislike:
+      biomeMult = 1.05;
+      break;
+
+    case NPCData.biomeHate:
+      biomeMult = 1.1;
+      break;
+  }
+
+  const others = biomeState[biome].filter(n => n !== npc);
+  let spaceMult = others.length < 2 ? 0.9 : 1;
+  if (others.length > 2)
+    spaceMult *= Math.pow(1.04, others.length - 1);
+
+  let neighbourMult = 1.0;
+  for (let i = 0; i < others.length; i++) {
+    if (NPCData.npcLove.find(n => n === others[i]))
+      neighbourMult *= 0.9;
+    else if (NPCData.npcLike.find(n => n === others[i]))
+      neighbourMult *= 0.95;
+    else if (NPCData.npcDislike.find(n => n === others[i]))
+      neighbourMult *= 1.05;
+    else if (NPCData.npcHate.find(n => n === others[i]))
+      neighbourMult *= 1.1;
+  }
+
+  let happiness = Math.round(clamp(biomeMult * spaceMult * neighbourMult, 0.75, 1.5) * 20) / 20;
+  return happiness.toPrecision(3).slice(0, 4);
+}
+
 function App() {
-  const [activeNPC, setActiveNPC] = useState<NPC>();
+  const [activeNPC, setActiveNPC] = useState<NPCName>();
   const [mousePos, setMousePos] = useState<MousePos>();
-  const [biomes, SetBiomes] = useState(InitialBiomeState);
+  const [biomeState, dispatch] = useReducer(biomeReducer, InitialBiomeState);
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
@@ -37,20 +138,39 @@ function App() {
     const onMouseUp = (e: MouseEvent) => {
       if ((e.target as HTMLElement).className === 'biome') {
         if (activeNPC !== undefined) {
-          const key = (e.target as HTMLImageElement).alt as BiomeType;
-          let npcsInBiome = biomes[key];
+          const newBiome = (e.target as HTMLImageElement).alt as BiomeType;
+          const prevBiome = findNPCInBiome(activeNPC, biomeState);
+          if (prevBiome && prevBiome !== newBiome) {
+            dispatch({
+              biome: prevBiome,
+              npcs: [...biomeState[prevBiome].filter(n => n !== activeNPC)]
+            });
+          }
+
+          let npcsInBiome = biomeState[newBiome];
           if (!npcsInBiome.find(name => name === activeNPC)) {
-            npcsInBiome = [...npcsInBiome, activeNPC];
-            SetBiomes({ ...biomes, [key]: npcsInBiome });
+            dispatch({
+              biome: newBiome,
+              npcs: [...npcsInBiome, activeNPC]
+            });
           }
         }
+      } else if (activeNPC !== undefined) {
+        const prevBiome = findNPCInBiome(activeNPC, biomeState);
+        if (prevBiome) {
+          dispatch({
+            biome: prevBiome,
+            npcs: [...biomeState[prevBiome].filter(n => n !== activeNPC)]
+          });
+        }
       }
+
       setActiveNPC(undefined);
     };
 
     window.addEventListener('mouseup', onMouseUp);
     return () => window.removeEventListener('mouseup', onMouseUp);
-  }, [activeNPC, biomes]);
+  }, [activeNPC, biomeState]);
 
   return (
     <div>
@@ -58,7 +178,7 @@ function App() {
         <div>
           <h1>Terraria Housing</h1>
           <div className='npcs'>
-            {NPCs.map(n => <img
+            {NPCs.filter(n => findNPCInBiome(n.name, biomeState) === null || activeNPC === n.name).map(n => <img
               key={n.name}
               className='npc'
               alt={n.name}
@@ -68,12 +188,9 @@ function App() {
                 e.preventDefault();
               }}
               style={activeNPC === n.name ? {
-                position: 'fixed',
-                zIndex: 1,
+                ...activeNPCStyle,
                 left: `${mousePos?.x}px`,
                 top: `${mousePos?.y}px`,
-                transform: 'translate(-50%, -50%)',
-                pointerEvents: 'none'
               } : {}}
             />)}
           </div>
@@ -83,24 +200,21 @@ function App() {
                 <img className='biome' alt={b.name} src={b.sprite} />
 
                 <div className='npc-holder'>
-                  {NPCs.filter(n => biomes[b.name].find(name => name === n.name)).map(n => <img
-                    key={n.name}
-                    className='npc'
-                    alt={n.name}
-                    src={n.sprite}
-                    onMouseDown={e => {
-                      setActiveNPC(n.name);
-                      e.preventDefault();
-                    }}
-                    style={activeNPC === n.name ? {
-                      position: 'fixed',
-                      zIndex: 1,
-                      left: `${mousePos?.x}px`,
-                      top: `${mousePos?.y}px`,
-                      transform: 'translate(-50%, -50%)',
-                      pointerEvents: 'none'
-                    } : {}}
-                  />)}
+                  {NPCs.filter(n => biomeState[b.name].find(name => name === n.name) && activeNPC !== n.name).map(n =>
+                    <div key={n.name}>
+                      <img
+                        className='npc'
+                        alt={n.name}
+                        src={n.sprite}
+                        onMouseDown={e => {
+                          setActiveNPC(n.name);
+                          e.preventDefault();
+                        }}
+                        style={activeNPC ? { pointerEvents: 'none' } : undefined}
+                      />
+                      <p>{calcHappiness(n.name, biomeState)}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
