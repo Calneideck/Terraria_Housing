@@ -14,10 +14,10 @@ body
         margin: 0px 5%
 
 .npcs
-    margin-bottom: 16px
     height: 68px
     display: flex
     align-items: flex-end
+    flex-flow: row wrap
 
 .npc
     padding: 4px
@@ -56,3 +56,44 @@ body
             text-align: center
             font-weight: bold
             text-shadow: black 1px 1px 2px
+
+.top-row
+    display: flex
+    margin-bottom: 16px
+
+    > div
+        margin-right: 16px
+
+.info-box
+    margin-left: auto
+    padding-top: 16px
+    width: 180px
+    height: 252px
+
+    h4, p
+        margin: 0
+
+    p
+        font-size: 12px
+
+        &:first-child
+            font-weight: bold
+            margin-right: auto
+
+    > div
+        display: flex
+        justify-content: space-between
+        align-items: center
+
+    .header
+        margin-bottom: 8px
+        height: 56px
+
+    .neighbours
+        margin-bottom: 4px
+        height: 32px
+        justify-content: flex-start
+
+        img
+            height: 32px
+            margin-left: 4px

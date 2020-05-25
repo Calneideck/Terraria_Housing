@@ -1,7 +1,8 @@
-import React, { useState, useEffect, CSSProperties, useReducer } from 'react';
+import React, { useState, useEffect, CSSProperties, useReducer, useMemo } from 'react';
 import './App.sass';
 
-import { NPCName, NPCs, BiomeType, Biomes } from './Stores';
+import { NPCName, NPCs, BiomeType, Biomes, INPC } from './Stores';
+import { InfoBox } from './InfoBox';
 
 interface MousePos {
   x: number;
@@ -120,8 +121,9 @@ const calcHappiness = (npc: NPCName, biomeState: BiomeState) => {
   return happiness.toPrecision(3).slice(0, 4);
 }
 
-function App() {
+export const App = () => {
   const [activeNPC, setActiveNPC] = useState<NPCName>();
+  const [infoNPC, setInfoNPC] = useState<INPC>();
   const [mousePos, setMousePos] = useState<MousePos>();
   const [biomeState, dispatch] = useReducer(biomeReducer, InitialBiomeState);
 
@@ -172,27 +174,42 @@ function App() {
     return () => window.removeEventListener('mouseup', onMouseUp);
   }, [activeNPC, biomeState]);
 
+  const happinessValues = useMemo(() => {
+    const values: any = {};
+    for (let i = 0; i < NPCs.length; i++)
+      if (findNPCInBiome(NPCs[i].name, biomeState))
+        values[NPCs[i].name] = calcHappiness(NPCs[i].name, biomeState);
+
+    return values;
+  }, [biomeState]);
+
   return (
     <div>
       <div className='container'>
         <div>
-          <h1>Terraria Housing</h1>
-          <div className='npcs'>
-            {NPCs.filter(n => findNPCInBiome(n.name, biomeState) === null || activeNPC === n.name).map(n => <img
-              key={n.name}
-              className='npc'
-              alt={n.name}
-              src={n.sprite}
-              onMouseDown={e => {
-                setActiveNPC(n.name);
-                e.preventDefault();
-              }}
-              style={activeNPC === n.name ? {
-                ...activeNPCStyle,
-                left: `${mousePos?.x}px`,
-                top: `${mousePos?.y}px`,
-              } : {}}
-            />)}
+          <div className='top-row'>
+            <div>
+              <h1>Terraria Housing</h1>
+              <div className='npcs'>
+                {NPCs.filter(n => findNPCInBiome(n.name, biomeState) === null || activeNPC === n.name).map(n => <img
+                  key={n.name}
+                  className='npc'
+                  alt={n.name}
+                  src={n.sprite}
+                  onMouseDown={e => {
+                    setActiveNPC(n.name);
+                    setInfoNPC(n);
+                    e.preventDefault();
+                  }}
+                  style={activeNPC === n.name ? {
+                    ...activeNPCStyle,
+                    left: `${mousePos?.x}px`,
+                    top: `${mousePos?.y}px`,
+                  } : {}}
+                />)}
+              </div>
+            </div>
+            <InfoBox npc={infoNPC} />
           </div>
           <div className='biomes'>
             {Biomes.map(b =>
@@ -208,11 +225,12 @@ function App() {
                         src={n.sprite}
                         onMouseDown={e => {
                           setActiveNPC(n.name);
+                          setInfoNPC(n);
                           e.preventDefault();
                         }}
                         style={activeNPC ? { pointerEvents: 'none' } : undefined}
                       />
-                      <p>{calcHappiness(n.name, biomeState)}</p>
+                      <p>{happinessValues[n.name]}</p>
                     </div>
                   )}
                 </div>
@@ -224,5 +242,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
