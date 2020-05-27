@@ -37,7 +37,10 @@ const activeNPCStyle: CSSProperties = {
   pointerEvents: 'none'
 };
 
-const biomeReducer = (state: BiomeState, action: { biome: BiomeType, npcs: NPCName[] }) => {
+type SetBiome = { biome: BiomeType, npcs: NPCName[] };
+type SetAll = { biome: 'all', housing: BiomeState };
+
+const biomeReducer = (state: BiomeState, action: SetBiome | SetAll) => {
   switch (action.biome) {
     case 'Forest':
       return { ...state, Forest: action.npcs }
@@ -62,6 +65,9 @@ const biomeReducer = (state: BiomeState, action: { biome: BiomeType, npcs: NPCNa
 
     case 'GlowingMushroom':
       return { ...state, GlowingMushroom: action.npcs }
+
+    case 'all':
+      return action.housing;
 
     default:
       return state;
@@ -126,6 +132,24 @@ export const App = () => {
   const [infoNPC, setInfoNPC] = useState<INPC>();
   const [mousePos, setMousePos] = useState<MousePos>();
   const [biomeState, dispatch] = useReducer(biomeReducer, InitialBiomeState);
+
+  useEffect(() => {
+    const housingString = localStorage.getItem('housing');
+    if (housingString)
+      try {
+        const housing = JSON.parse(housingString) as BiomeState;
+        dispatch({
+          biome: 'all',
+          housing: housing
+        });
+      } catch { }
+
+  }, []);
+
+  useEffect(() => {
+    if (biomeState !== InitialBiomeState)
+      localStorage.setItem('housing', JSON.stringify(biomeState));
+  }, [biomeState]);
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
