@@ -43,23 +43,51 @@ button
     > div
         width: 50%
         position: relative
+        margin-bottom: -6px
 
         img.biome
             width: 100%
+            display: block
 
-        .npc-holder
+        .villages
             position: absolute
-            left: 32px
-            right: 32px
+            left: 36px
+            right: 36px
             top: 12px
-            height: 87px
+            bottom: 12px
             display: flex
             flex-flow: row wrap
-            align-items: flex-end
             pointer-events: none
+            align-items: flex-start
 
-            > div
-                margin-right: 4px
+            .village
+                display: flex
+                flex-flow: row wrap
+                flex: 1
+                align-items: flex-end
+
+                &.new
+                    height: 100%
+                    flex: 0 1 10%
+                    display: flex
+                    justify-content: center
+                    align-items: center
+
+                    span
+                        width: 30px
+                        height: 30px
+                        color: white
+                        font-size: 20px
+                        font-weight: bold
+                        background-color: #60bf48
+                        border-radius: 100%
+                        display: flex
+                        justify-content: center
+                        align-items: center
+                        box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 5px 1px
+
+                > div
+                    margin-right: 4px
 
         p
             color: white
