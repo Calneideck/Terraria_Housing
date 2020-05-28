@@ -166,29 +166,32 @@ export const App = () => {
         if (activeNPC !== undefined) {
           const newBiome = (e.target as HTMLImageElement).alt as BiomeType;
           const prevBiome = findNPCInBiome(activeNPC, biomeState);
-          if (prevBiome && prevBiome !== newBiome) {
+          if (activeNPC === 'Truffle' && newBiome !== 'GlowingMushroom') {
+            alert('Truffle can only live in Glowing Mushroom');
+            return;
+          }
+
+          if (prevBiome && prevBiome !== newBiome)
             dispatch({
               biome: prevBiome,
               npcs: [...biomeState[prevBiome].filter(n => n !== activeNPC)]
             });
-          }
 
           let npcsInBiome = biomeState[newBiome];
-          if (!npcsInBiome.find(name => name === activeNPC)) {
+          if (!npcsInBiome.find(name => name === activeNPC))
             dispatch({
               biome: newBiome,
               npcs: [...npcsInBiome, activeNPC]
             });
-          }
         }
       } else if (activeNPC !== undefined) {
+        // Remove npc from biome
         const prevBiome = findNPCInBiome(activeNPC, biomeState);
-        if (prevBiome) {
+        if (prevBiome)
           dispatch({
             biome: prevBiome,
             npcs: [...biomeState[prevBiome].filter(n => n !== activeNPC)]
           });
-        }
       }
 
       setActiveNPC(undefined);
@@ -206,6 +209,13 @@ export const App = () => {
 
     return values;
   }, [biomeState]);
+
+  const onReset = () => {
+    dispatch({
+      biome: 'all',
+      housing: { ...InitialBiomeState }
+    });
+  }
 
   return (
     <div>
@@ -232,6 +242,7 @@ export const App = () => {
                   } : {}}
                 />)}
               </div>
+              <button style={{ marginTop: 8 }} onClick={onReset}>Reset</button>
             </div>
             <InfoBox npc={infoNPC} />
           </div>

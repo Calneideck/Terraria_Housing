@@ -37,20 +37,16 @@ import Zoologist from './images/npcs/Zoologist.png';
 
 export const Biomes = [
     {
-        name: 'Cavern',
-        sprite: Cavern
+        name: 'Forest',
+        sprite: Forest
     },
     {
         name: 'Desert',
         sprite: Desert
     },
     {
-        name: 'Forest',
-        sprite: Forest
-    },
-    {
-        name: 'GlowingMushroom',
-        sprite: GlowingMushroom
+        name: 'Cavern',
+        sprite: Cavern
     },
     {
         name: 'Hallow',
@@ -61,12 +57,16 @@ export const Biomes = [
         sprite: Jungle
     },
     {
-        name: 'Ocean',
-        sprite: Ocean
-    },
-    {
         name: 'Snow',
         sprite: Snow
+    },
+    {
+        name: 'GlowingMushroom',
+        sprite: GlowingMushroom
+    },
+    {
+        name: 'Ocean',
+        sprite: Ocean
     },
 ] as const;
 
@@ -77,7 +77,7 @@ export type NPCName = 'Angler' | 'Arms Dealer' | 'Clothier' | 'Cyborg' | 'Demoli
 export interface INPC {
     name: NPCName;
     sprite: string;
-    
+
     biomeLove?: BiomeType;
     biomeLike?: BiomeType;
     biomeDislike?: BiomeType;

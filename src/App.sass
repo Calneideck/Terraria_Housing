@@ -13,6 +13,17 @@ body
         max-width: 1200px
         margin: 0px 5%
 
+button
+    padding: 8px 32px
+    border-radius: 4px
+    border: 0
+    background-color: #60bf48
+    outline: none
+    cursor: pointer
+
+    &:active
+        background-color: #50aa3a
+
 .npcs
     height: 68px
     display: flex
@@ -41,7 +52,7 @@ body
             left: 32px
             right: 32px
             top: 12px
-            height: 68px
+            height: 87px
             display: flex
             flex-flow: row wrap
             align-items: flex-end
@@ -68,7 +79,7 @@ body
     margin-left: auto
     padding-top: 16px
     width: 180px
-    height: 236px
+    height: 166px
 
     h4, p
         margin: 0
@@ -89,10 +100,28 @@ body
         margin-bottom: 8px
         height: 56px
 
+    .neighbours-row
+        margin-top: 4px
+
     .neighbours
-        margin-bottom: 4px
         height: 32px
+        flex: 1
+        display: flex
         justify-content: flex-start
+
+        &:first-child
+            margin-right: 8px
+
+    table
+        width: 100%
+
+        th
+            font-size: 12px
+            text-align: left
+
+        td
+            display: flex
+            justify-content: flex-end
 
         img
             height: 32px
