@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { INPC, NPCs } from './Stores';
+import { INPC, NPCs } from './Model';
 
 interface IInfoBoxProps {
     npc?: INPC;

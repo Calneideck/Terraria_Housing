@@ -1,35 +1,12 @@
 import React, { useState, useEffect, CSSProperties, useReducer, useMemo, useCallback } from 'react';
 import './App.sass';
 
-import { NPCName, NPCs, BiomeType, Biomes, INPC } from './Stores';
+import { NPCName, NPCs, BiomeType, Biomes, INPC, BiomeState, findNPCInBiome, InitialBiomeState, biomeReducer } from './Model';
 import { InfoBox } from './InfoBox';
 
 interface MousePos {
   x: number;
   y: number;
-}
-
-type BiomeState = { [key in BiomeType]: NPCName[][] };
-
-const InitialBiomeState: BiomeState = {
-  Forest: [[]],
-  Cavern: [[]],
-  GlowingMushroom: [[]],
-  Desert: [[]],
-  Hallow: [[]],
-  Jungle: [[]],
-  Ocean: [[]],
-  Snow: [[]]
-};
-
-type FindBiomeType = (npc: NPCName, state: BiomeState) => [BiomeType, number] | null;
-const findNPCInBiome: FindBiomeType = (npc: NPCName, state: BiomeState) => {
-  for (let [key, value] of Object.entries(state))
-    for (let [i, array] of Object.entries(value))
-      if (array.find(name => name === npc))
-        return [key as BiomeType, Number(i)];
-
-  return null;
 }
 
 const activeNPCStyle: CSSProperties = {
@@ -38,43 +15,6 @@ const activeNPCStyle: CSSProperties = {
   transform: 'translate(-50%, -50%)',
   pointerEvents: 'none'
 };
-
-type SetBiome = { biome: BiomeType, npcs: NPCName[][] };
-type SetAll = { biome: 'all', housing: BiomeState };
-
-const biomeReducer = (state: BiomeState, action: SetBiome | SetAll) => {
-  switch (action.biome) {
-    case 'Forest':
-      return { ...state, Forest: action.npcs }
-
-    case 'Cavern':
-      return { ...state, Cavern: action.npcs }
-
-    case 'Snow':
-      return { ...state, Snow: action.npcs }
-
-    case 'Desert':
-      return { ...state, Desert: action.npcs }
-
-    case 'Jungle':
-      return { ...state, Jungle: action.npcs }
-
-    case 'Hallow':
-      return { ...state, Hallow: action.npcs }
-
-    case 'Ocean':
-      return { ...state, Ocean: action.npcs }
-
-    case 'GlowingMushroom':
-      return { ...state, GlowingMushroom: action.npcs }
-
-    case 'all':
-      return action.housing;
-
-    default:
-      return state;
-  }
-}
 
 const clamp = (val: number, min: number, max: number) => {
   return Math.min(max, Math.max(val, min));
@@ -133,6 +73,7 @@ export const App = () => {
   const [activeNPC, setActiveNPC] = useState<NPCName>();
   const [infoNPC, setInfoNPC] = useState<INPC>();
   const [mousePos, setMousePos] = useState<MousePos>();
+  const [hoverVillage, setHoverVillage] = useState<number[]>();
   const [biomeState, dispatch] = useReducer(biomeReducer, InitialBiomeState);
 
   useEffect(() => {
@@ -165,7 +106,10 @@ export const App = () => {
   const removeFromBiome = useCallback((biome: BiomeType, npc: NPCName, index: number) => {
     const innerArray = biomeState[biome][index].filter(n => n !== npc);
     const newArray = [...biomeState[biome]];
-    newArray[index] = innerArray;
+    if (innerArray.length > 0 || (index === 0 && newArray.length === 1))
+      newArray[index] = innerArray;
+    else
+      newArray.splice(index, 1);
 
     dispatch({
       biome: biome,
@@ -174,45 +118,49 @@ export const App = () => {
   }, [biomeState, dispatch]);
 
   useEffect(() => {
-    const onMouseUp = (e: MouseEvent) => {
-      if ((e.target as HTMLElement).className === 'biome') {
-        if (activeNPC !== undefined) {
-          const newBiome = (e.target as HTMLImageElement).alt as BiomeType;
+    const onMouseUp = () => {
+      if (activeNPC !== undefined)
+        if (hoverVillage) {
+          const newBiome = Biomes[hoverVillage[0]].name;
           const prevBiome = findNPCInBiome(activeNPC, biomeState);
           if (activeNPC === 'Truffle' && newBiome !== 'GlowingMushroom') {
             alert('Truffle can only live in Glowing Mushroom');
-            e.returnValue = false;
             return;
           }
 
-          if (prevBiome && prevBiome[0] !== newBiome)
+          if (prevBiome && (prevBiome[0] !== newBiome || prevBiome[1] !== hoverVillage[1]))
             removeFromBiome(prevBiome[0], activeNPC, prevBiome[1]);
 
-          let npcsInBiome = biomeState[newBiome][0];
-          if (!npcsInBiome.find(name => name === activeNPC)) {
-            const innerArray = [...npcsInBiome, activeNPC];
-            const newArray = [...biomeState[newBiome]];
-            newArray[0] = innerArray;
+          const npcsInBiome = biomeState[newBiome][hoverVillage[1]];
+          if (!npcsInBiome || !npcsInBiome.find(name => name === activeNPC)) {
+            const innerArray = npcsInBiome ? [...npcsInBiome, activeNPC] : [activeNPC];
+            const newArray = biomeState[newBiome].map(array => array.filter(n => n !== activeNPC));
+            newArray[hoverVillage[1] >= 0 ? hoverVillage[1] : newArray.length] = innerArray;
+            for (let i in newArray)
+              if (newArray[i].length === 0) {
+                newArray.splice(Number(i), 1);
+                break;
+              }
 
             dispatch({
               biome: newBiome,
               npcs: newArray
             });
           }
+        } else {
+          // Remove NPC from biome
+          const prevBiome = findNPCInBiome(activeNPC, biomeState);
+          if (prevBiome)
+            removeFromBiome(prevBiome[0], activeNPC, prevBiome[1]);
         }
-      } else if (activeNPC !== undefined) {
-        // Remove npc from biome
-        const prevBiome = findNPCInBiome(activeNPC, biomeState);
-        if (prevBiome)
-          removeFromBiome(prevBiome[0], activeNPC, prevBiome[1]);
-      }
 
       setActiveNPC(undefined);
+      setHoverVillage(undefined);
     };
 
     window.addEventListener('mouseup', onMouseUp);
     return () => window.removeEventListener('mouseup', onMouseUp);
-  }, [activeNPC, biomeState, removeFromBiome]);
+  }, [activeNPC, biomeState, hoverVillage, removeFromBiome]);
 
   const happinessValues = useMemo(() => {
     const values: any = {};
@@ -260,13 +208,21 @@ export const App = () => {
             <InfoBox npc={infoNPC} />
           </div>
           <div className='biomes'>
-            {Biomes.map(b =>
+            {Biomes.map((b, bIndex) =>
               <div key={b.name}>
                 <img className='biome' alt={b.name} src={b.sprite} />
 
                 <div className='villages'>
                   {biomeState[b.name].map((array, i) => (
-                    <div key={i} className='village'>
+                    <div
+                      key={i}
+                      className={`village${hoverVillage && hoverVillage[0] === bIndex && hoverVillage[1] === i ? ' active' : ''}`}
+                      onMouseEnter={() => {
+                        if (activeNPC)
+                          setHoverVillage([bIndex, i]);
+                      }}
+                      onMouseLeave={() => setHoverVillage(undefined)}
+                    >
                       {NPCs.filter(n => array.find(name => name === n.name) && activeNPC !== n.name).map(n =>
                         <div key={n.name}>
                           <img
@@ -276,6 +232,7 @@ export const App = () => {
                             onMouseDown={e => {
                               setActiveNPC(n.name);
                               setInfoNPC(n);
+                              setHoverVillage([bIndex, i]);
                               e.preventDefault();
                             }}
                             style={activeNPC ? { pointerEvents: 'none' } : undefined}
@@ -285,7 +242,14 @@ export const App = () => {
                       )}
                     </div>
                   ))}
-                  <div className='village new'>
+                  <div
+                    className={`village new${hoverVillage && hoverVillage[0] === bIndex && hoverVillage[1] === -1 ? ' active' : ''}`}
+                    onMouseEnter={() => {
+                      if (activeNPC)
+                        setHoverVillage([bIndex, -1]);
+                    }}
+                    onMouseLeave={() => setHoverVillage(undefined)}
+                  >
                     {activeNPC && <span>+</span>}
                   </div>
                 </div>

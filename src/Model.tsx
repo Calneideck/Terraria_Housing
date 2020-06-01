@@ -72,6 +72,65 @@ export const Biomes = [
 
 export type BiomeType = typeof Biomes[number]['name'];
 
+export type BiomeState = { [key in BiomeType]: NPCName[][] };
+
+export const InitialBiomeState: BiomeState = {
+  Forest: [[]],
+  Cavern: [[]],
+  GlowingMushroom: [[]],
+  Desert: [[]],
+  Hallow: [[]],
+  Jungle: [[]],
+  Ocean: [[]],
+  Snow: [[]]
+};
+
+type FindBiomeType = (npc: NPCName, state: BiomeState) => [BiomeType, number] | null;
+export const findNPCInBiome: FindBiomeType = (npc: NPCName, state: BiomeState) => {
+  for (let [key, value] of Object.entries(state))
+    for (let [i, array] of Object.entries(value))
+      if (array.find(name => name === npc))
+        return [key as BiomeType, Number(i)];
+
+  return null;
+}
+
+type SetBiome = { biome: BiomeType, npcs: NPCName[][] };
+type SetAll = { biome: 'all', housing: BiomeState };
+export const biomeReducer = (state: BiomeState, action: SetBiome | SetAll) => {
+  switch (action.biome) {
+    case 'Forest':
+      return { ...state, Forest: action.npcs }
+
+    case 'Cavern':
+      return { ...state, Cavern: action.npcs }
+
+    case 'Snow':
+      return { ...state, Snow: action.npcs }
+
+    case 'Desert':
+      return { ...state, Desert: action.npcs }
+
+    case 'Jungle':
+      return { ...state, Jungle: action.npcs }
+
+    case 'Hallow':
+      return { ...state, Hallow: action.npcs }
+
+    case 'Ocean':
+      return { ...state, Ocean: action.npcs }
+
+    case 'GlowingMushroom':
+      return { ...state, GlowingMushroom: action.npcs }
+
+    case 'all':
+      return action.housing;
+
+    default:
+      return state;
+  }
+}
+
 export type NPCName = 'Angler' | 'Arms Dealer' | 'Clothier' | 'Cyborg' | 'Demolitionist' | 'Dryad' | 'Dye Trader' | 'Goblin Tinkerer' | 'Golfer' | 'Guide' | 'Mechanic' | 'Merchant' | 'Nurse' | 'Painter' | 'Party Girl' | 'Pirate' | 'Santa Claus' | 'Steampunker' | 'Stylist' | 'Tavernkeep' | 'Tax Collector' | 'Truffle' | 'Witch Doctor' | 'Wizard' | 'Zoologist';
 
 export interface INPC {
