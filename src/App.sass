@@ -1,162 +1,190 @@
 body
-    margin: 0
-    font-family: sans-serif
+  margin: 0
+  font-family: sans-serif
 
 .container
-    display: flex
-    justify-content: center
-    align-items: flex-start
-    width: 100%
+  display: flex
+  justify-content: center
+  align-items: flex-start
+  width: 100%
 
-    > div
-        width: 100%
-        max-width: 1200px
-        margin: 0px 5%
+  > div
+    width: 100%
+    max-width: 1200px
+    margin: 0px 5%
 
 button
-    padding: 8px 32px
-    border-radius: 4px
-    border: 0
-    background-color: #60bf48
-    outline: none
-    cursor: pointer
+  padding: 8px 32px
+  border-radius: 4px
+  border: 0
+  background-color: #60bf48
+  outline: none
+  cursor: pointer
 
-    &:active
-        background-color: #50aa3a
+  &:active
+    background-color: #50aa3a
 
 .npcs
-    min-height: 68px
-    display: flex
-    align-items: flex-end
-    flex-flow: row wrap
+  min-height: 68px
+  display: flex
+  align-items: flex-end
+  flex-flow: row wrap
 
 .npc
-    padding: 4px
-    pointer-events: auto
+  padding: 4px
+  pointer-events: auto
+  touch-action: none
 
 .biomes
-    width: 100%
+  width: 100%
+  display: flex
+  flex-flow: row wrap
+  align-items: flex-start
+
+  > div
+    width: 50%
+    position: relative
+    margin-bottom: -6px
+
+    img.biome
+      width: 100%
+      display: block
+
+.villages
+  position: absolute
+  left: 36px
+  right: 36px
+  top: 12px
+  bottom: 12px
+  display: flex
+  flex-flow: row wrap
+  pointer-events: none
+
+  .village
     display: flex
     flex-flow: row wrap
-    align-items: flex-start
+    flex: 1
+    pointer-events: auto
+
+    &.new
+      height: 100%
+      flex: 0 1 10%
+      display: flex
+      justify-content: center
+      align-items: center
+
+      span
+        width: 30px
+        height: 30px
+        color: white
+        font-size: 20px
+        font-weight: bold
+        background-color: #60bf48
+        border-radius: 100%
+        display: flex
+        justify-content: center
+        align-items: center
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 5px 1px
+        pointer-events: none
+
+    &.active
+      background-color: rgba(255, 255, 255, 0.4)
 
     > div
-        width: 50%
-        position: relative
-        margin-bottom: -6px
+      margin-right: 16px
+      display: flex
+      flex-flow: column nowrap
+      justify-content: flex-end
+      height: 54px
+      position: relative
 
-        img.biome
-            width: 100%
-            display: block
-
-        .villages
-            position: absolute
-            left: 36px
-            right: 36px
-            top: 12px
-            bottom: 12px
-            display: flex
-            flex-flow: row wrap
-            pointer-events: none
-
-            .village
-                display: flex
-                flex-flow: row wrap
-                flex: 1
-                pointer-events: auto
-
-                &.new
-                    height: 100%
-                    flex: 0 1 10%
-                    display: flex
-                    justify-content: center
-                    align-items: center
-
-                    span
-                        width: 30px
-                        height: 30px
-                        color: white
-                        font-size: 20px
-                        font-weight: bold
-                        background-color: #60bf48
-                        border-radius: 100%
-                        display: flex
-                        justify-content: center
-                        align-items: center
-                        box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 5px 1px
-
-                &.active
-                    background-color: rgba(255, 255, 255, 0.4)
-
-                > div
-                    margin-right: 4px
-                    display: flex
-                    flex-flow: column nowrap
-                    justify-content: flex-end
-                    height: 83px
-
-        p
-            color: white
-            margin: 0
-            text-align: center
-            font-weight: bold
-            text-shadow: black 1px 1px 2px
+  p
+    color: white
+    margin: 0
+    text-align: center
+    font-weight: bold
+    text-shadow: black 1px 1px 2px
+    position: absolute
+    top: 100%
+    left: 50%
+    transform: translateX(-50%)
 
 .top-row
-    display: flex
-    margin-bottom: 16px
+  display: flex
+  margin-bottom: 16px
 
-    > div
-        margin-right: 16px
+  > div
+    margin-right: 16px
 
 .info-box
-    margin-left: auto
-    padding-top: 16px
-    width: 180px
-    height: 166px
+  margin-left: auto
+  padding-top: 16px
+  min-width: 180px
+  height: 166px
 
-    h4, p
-        margin: 0
+  h4, p
+    margin: 0
 
-    p
-        font-size: 12px
+  p
+    font-size: 12px
 
-        &:first-child
-            font-weight: bold
-            margin-right: auto
+    &:first-child
+      font-weight: bold
+      margin-right: auto
 
-    > div
-        display: flex
-        justify-content: space-between
-        align-items: center
+  > div
+    display: flex
+    justify-content: space-between
+    align-items: center
 
-    .header
-        margin-bottom: 8px
-        height: 56px
+  .header
+    margin-bottom: 8px
+    height: 56px
 
-    .neighbours-row
-        margin-top: 4px
+  .neighbours-row
+    margin-top: 4px
 
-    .neighbours
-        height: 32px
-        flex: 1
-        display: flex
-        justify-content: flex-start
+  .neighbours
+    height: 32px
+    flex: 1
+    display: flex
+    justify-content: flex-start
 
-        &:first-child
-            margin-right: 8px
+    &:first-child
+      margin-right: 8px
 
-    table
-        width: 100%
+  table
+    width: 100%
 
-        th
-            font-size: 12px
-            text-align: left
+    th
+      font-size: 12px
+      text-align: left
 
-        td
-            display: flex
-            justify-content: flex-end
+    td
+      display: flex
+      justify-content: flex-end
 
-        img
-            height: 32px
-            margin-left: 4px
+    img
+      height: 32px
+      margin-left: 4px
+
+h2
+  margin: 30px 0 8px
+
+ul
+  margin: 0
+
+@media (max-width: 767px)
+  .top-row
+    display: block
+  
+  .biomes > div
+    width: 100%
+
+  .villages
+    top: 0px
+    left: 15px
+    right: 15px
+
+  .village
+    touch-action: none
