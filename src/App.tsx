@@ -90,21 +90,23 @@ export const App = () => {
           housing: housing
         });
       } catch { }
+
+    const onMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+
+    if (window.innerWidth < 768) {
+      alert('This site is not suitable for mobile devices.')
+    }
+
+    window.addEventListener('mousemove', onMouseMove);
+    return () => window.removeEventListener('mousemove', onMouseMove);
   }, []);
 
   useEffect(() => {
     if (biomeState !== InitialBiomeState)
       localStorage.setItem('housing', JSON.stringify(biomeState));
   }, [biomeState]);
-
-  useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-
-    window.addEventListener('mousemove', onMouseMove);
-    return () => window.removeEventListener('mousemove', onMouseMove);
-  }, []);
 
   useEffect(() => {
     const onTouchMove = (e: TouchEvent) => {
